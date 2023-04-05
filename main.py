@@ -1,5 +1,5 @@
 import pygame
-from pygame.constants import QUIT,K_DOWN,K_UP
+from pygame.constants import QUIT,K_DOWN,K_UP,K_LEFT,K_RIGHT
 pygame.init()
 screen = width,hight = 800, 600
 print(screen)
@@ -40,3 +40,15 @@ while is_working:
     if pressed_keys[K_UP]:
         ball_rect = ball_rect.move(0,-ball_speed)
     pygame.display.flip()         
+    
+    if pressed_keys[K_LEFT]:
+        ball_rect = ball_rect.move(-ball_speed,0)
+        
+    if pressed_keys[K_RIGHT]:
+        ball_rect = ball_rect.move(ball_speed,0)
+        
+        
+        
+        
+                
+        
