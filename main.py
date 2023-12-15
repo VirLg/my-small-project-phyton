@@ -1,54 +1,94 @@
+import random
 import pygame
-from pygame.constants import QUIT,K_DOWN,K_UP,K_LEFT,K_RIGHT
-pygame.init()
-screen = width,hight = 800, 600
-print(screen)
-BLACK=0,0,0
-WHITE=255,255,255
-RED = 255,160,122
-GREEN = 124,252,0
-main_surface = pygame.display.set_mode(screen)
-ball = pygame.Surface((20,20))
-ball.fill(WHITE)
-ball_rect = ball.get_rect()
-ball_speed = 1
-is_working = True  
+from pygame.constants import QUIT, K_DOWN, K_UP, K_LEFT, K_RIGHT, K_w
 
-while is_working:
+pygame.init()
+FPS = pygame.time.Clock()
+            # Display
+WIDTH = 1000
+HEIGHT=600
+main_display = pygame.display.set_mode((WIDTH,HEIGHT))
+COLOR_BLACK=(0,0,0)
+            # Player
+COLOR_WHITE = (255,255,255)
+player_size = (20,20)
+player = pygame.Surface(player_size)
+player_rect = player.get_rect()
+player_move_down=[0,1]
+player_move_up=[0,-1]
+player_move_left=[-1,0]
+player_move_right=[1,0]
+player.fill(COLOR_WHITE)
+            # Enemy
+def create_enemy():            
+    COLOR_BLUE = (0,0,255)
+    enemy_size = (40,40)
+    enemy = pygame.Surface(enemy_size)
+    enemy.fill(COLOR_BLUE)
+    enemy_rect=pygame.Rect(WIDTH,random.randint(0,HEIGHT), *enemy_size)
+    enemy_move=[random.randint(-6,-1),0]
+    return [enemy, enemy_rect, enemy_move]
+
+CREATE_ENEMY = pygame.USEREVENT+1
+pygame.time.set_timer(CREATE_ENEMY,1500)
+            # Prize
+def create_prize():              
+    COLOR_RED = (255,0,0)
+    prize_size = (40,40)
+    prize = pygame.Surface(prize_size)
+    prize.fill(COLOR_RED)
+    prize_rect=pygame.Rect(random.randint(0,WIDTH),0, *prize_size)
+    prize_move=[0,1]
+    return[prize,prize_rect,prize_move]
+CREATE_PRIZE = pygame.USEREVENT+2
+pygame.time.set_timer(CREATE_PRIZE,5000)
+
+enemies=[]
+prizes=[]
+
+playing=True
+while playing:
+    FPS.tick(240)   
     for event in pygame.event.get():
         if event.type==QUIT:
-            is_working==False
+            playing=False 
+        if event.type==CREATE_ENEMY:
+            enemies.append(create_enemy())
+        if event.type==CREATE_PRIZE:
+            prizes.append(create_prize())
+                       
+    main_display.fill(COLOR_BLACK)
+    
+    keys=pygame.key.get_pressed()
+    if keys[K_DOWN]and player_rect.bottom<HEIGHT: 
+        player_rect = player_rect.move(player_move_down)
+    if keys [K_UP] and player_rect.top>0: 
+        player_rect = player_rect.move(player_move_up)
+    if keys[K_LEFT]and player_rect.left>0: 
+        player_rect = player_rect.move(player_move_left)
+    if keys[K_RIGHT]and player_rect.right<WIDTH: 
+        player_rect = player_rect.move(player_move_right)
     
     
-    pressed_keys = pygame.key.get_pressed(); 
+    for enemy in enemies:
+        enemy[1]=enemy[1].move(enemy[2])
+        main_display.blit(enemy[0], enemy[1])
+     
+    for prize in prizes:
+        prize[1]=prize[1].move(prize[2])
+        main_display.blit(prize[0], prize[1]) 
+              
+    main_display.blit(player, player_rect)  
+      
+    pygame.display.flip()
     
-    # if ball_rect.bottom>=hight or ball_rect.top<=0:
-    #     ball_speed[1] = -ball_speed[1]
-    #     ball.fill(RED)
-    
-    
-    if ball_rect.right>=width or ball_rect.left<=0: 
-        # ball_speed[0] = -ball_speed[0]
-        ball.fill(GREEN)
-    
-    main_surface.fill(BLACK)
-    main_surface.blit(ball, ball_rect)
-    
-    if pressed_keys[K_DOWN]:
-        ball_rect = ball_rect.move(0,ball_speed)
+    for enemy in enemies:
+        if enemy[1].left<0:
+            enemies.pop(enemies.index(enemy))
+    for prize in prizes:
+        if prize[1].top>HEIGHT:
+            prizes.pop(prizes.index(prize))
         
-    if pressed_keys[K_UP]:
-        ball_rect = ball_rect.move(0,-ball_speed)
-    pygame.display.flip()         
+            
+            
     
-    if pressed_keys[K_LEFT]:
-        ball_rect = ball_rect.move(-ball_speed,0)
-        
-    if pressed_keys[K_RIGHT]:
-        ball_rect = ball_rect.move(ball_speed,0)
-        
-        
-        
-        
-                
-        
