@@ -58,7 +58,6 @@ pygame.time.set_timer(CREATE_PRIZE,5000)
 
 CHANGE_GOOSE_IMAGE = pygame.USEREVENT+3
 pygame.time.set_timer(CHANGE_GOOSE_IMAGE,200)
-
 enemies=[]
 prizes=[]
 counter=0
@@ -75,7 +74,6 @@ while playing:
         if event.type==CREATE_PRIZE:
             prizes.append(create_prize())
         if event.type== CHANGE_GOOSE_IMAGE:
-            print(PLAYER_IMAGES)
             player=pygame.image.load(os.path.join(PLAYER_PATH, PLAYER_IMAGES[image_goose_index]))
             image_goose_index+=1
             if image_goose_index>=len(PLAYER_IMAGES):
