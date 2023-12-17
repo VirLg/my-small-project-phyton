@@ -5,44 +5,51 @@ from pygame.constants import QUIT, K_DOWN, K_UP, K_LEFT, K_RIGHT, K_w
 pygame.init()
 FPS = pygame.time.Clock()
             # Display
-WIDTH = 1200
-HEIGHT=800
+WIDTH = 800
+HEIGHT=600
 FONT=pygame.font.SysFont("Verdana", 20)
 
 main_display = pygame.display.set_mode((WIDTH,HEIGHT))
-BACKGROUND=pygame.image.load('./bonus.png')
+BACKGROUND=pygame.transform.scale(pygame.image.load('background.png'), (WIDTH,HEIGHT))
+BG_X1=0
+BG_X2=BACKGROUND.get_width()
+BG_move=3
+
 
 COLOR_BLACK=(0,0,0)
             # Player
 COLOR_WHITE = (255,255,255)
-player_size = (20,20)
-player = pygame.Surface(player_size)
-player_rect = player.get_rect()
-player_move_down=[0,1]
-player_move_up=[0,-1]
-player_move_left=[-1,0]
-player_move_right=[1,0]
-player.fill(COLOR_WHITE)
+player_size = (80,30)
+player =pygame.image.load("player.png").convert_alpha() # player = pygame.Surface(player_size)
+player_rect=pygame.Rect(0 ,300, *player_size)
+# player_rect = player.get_rect()
+player_move_down=[0,5]
+player_move_up=[0,-5]
+player_move_left=[-5,0]
+player_move_right=[5,0]
+# player.fill(COLOR_WHITE)
             # Enemy
 def create_enemy():            
     COLOR_BLUE = (0,0,255)
-    enemy_size = (40,40)
-    enemy = pygame.Surface(enemy_size)
-    enemy.fill(COLOR_BLUE)
-    enemy_rect=pygame.Rect(WIDTH,random.randint(0,HEIGHT), *enemy_size)
-    enemy_move=[random.randint(-6,-1),0]
+    enemy_size = (20,80)
+    enemy =pygame.image.load("enemy.png").convert_alpha()
+    # enemy = pygame.Surface(enemy_size)
+    # enemy.fill(COLOR_BLUE)
+    enemy_rect=pygame.Rect(WIDTH ,random.randint(50,HEIGHT-50), *enemy_size)
+    enemy_move=[random.randint(-8,-4),0]
     return [enemy, enemy_rect, enemy_move]
 
 CREATE_ENEMY = pygame.USEREVENT+1
-pygame.time.set_timer(CREATE_ENEMY,1500)
+pygame.time.set_timer(CREATE_ENEMY,2500)
             # Prize
 def create_prize():              
     COLOR_RED = (255,0,0)
-    prize_size = (40,40)
-    prize = pygame.Surface(prize_size)
-    prize.fill(COLOR_RED)
-    prize_rect=pygame.Rect(random.randint(0,WIDTH),0, *prize_size)
-    prize_move=[0,1]
+    prize_size = (20,20)
+    prize =pygame.image.load("bonus.png").convert_alpha()
+    # prize = pygame.Surface(prize_size)
+    # prize.fill(COLOR_RED)
+    prize_rect=pygame.Rect(random.randint(50,WIDTH-50),0, *prize_size)
+    prize_move=[0,random.randint(4,8)]
     return[prize,prize_rect,prize_move]
 CREATE_PRIZE = pygame.USEREVENT+2
 pygame.time.set_timer(CREATE_PRIZE,5000)
@@ -52,7 +59,7 @@ prizes=[]
 counter=0
 playing=True
 while playing:
-    FPS.tick(240)   
+    FPS.tick(1200)   
     for event in pygame.event.get():
         if event.type==QUIT:
             playing=False 
@@ -62,7 +69,17 @@ while playing:
             prizes.append(create_prize())
                        
     # main_display.blit(BACKGROUND, (0,0))
-    main_display.blit(BACKGROUND, (0,0))
+    BG_X1-=BG_move
+    BG_X2-=BG_move
+    
+    if BG_X1<-BACKGROUND.get_width():
+        BG_X1=BACKGROUND.get_width()
+    
+    if BG_X2<-BACKGROUND.get_width():
+        BG_X2=BACKGROUND.get_width()
+    
+    main_display.blit(BACKGROUND, (BG_X1,0))
+    main_display.blit(BACKGROUND, (BG_X2,0))
     
     keys=pygame.key.get_pressed()
     if keys[K_DOWN]and player_rect.bottom<HEIGHT: 
