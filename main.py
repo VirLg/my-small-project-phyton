@@ -5,9 +5,13 @@ from pygame.constants import QUIT, K_DOWN, K_UP, K_LEFT, K_RIGHT, K_w
 pygame.init()
 FPS = pygame.time.Clock()
             # Display
-WIDTH = 1000
-HEIGHT=600
+WIDTH = 1200
+HEIGHT=800
+FONT=pygame.font.SysFont("Verdana", 20)
+
 main_display = pygame.display.set_mode((WIDTH,HEIGHT))
+BACKGROUND=pygame.image.load('./bonus.png')
+
 COLOR_BLACK=(0,0,0)
             # Player
 COLOR_WHITE = (255,255,255)
@@ -45,7 +49,7 @@ pygame.time.set_timer(CREATE_PRIZE,5000)
 
 enemies=[]
 prizes=[]
-
+counter=0
 playing=True
 while playing:
     FPS.tick(240)   
@@ -57,7 +61,8 @@ while playing:
         if event.type==CREATE_PRIZE:
             prizes.append(create_prize())
                        
-    main_display.fill(COLOR_BLACK)
+    # main_display.blit(BACKGROUND, (0,0))
+    main_display.blit(BACKGROUND, (0,0))
     
     keys=pygame.key.get_pressed()
     if keys[K_DOWN]and player_rect.bottom<HEIGHT: 
@@ -69,15 +74,22 @@ while playing:
     if keys[K_RIGHT]and player_rect.right<WIDTH: 
         player_rect = player_rect.move(player_move_right)
     
-    
     for enemy in enemies:
         enemy[1]=enemy[1].move(enemy[2])
         main_display.blit(enemy[0], enemy[1])
      
+        if player_rect.colliderect(enemy[1]):
+            playing=False
+        
     for prize in prizes:
         prize[1]=prize[1].move(prize[2])
         main_display.blit(prize[0], prize[1]) 
-              
+        
+        if player_rect.colliderect(prize[1]):
+            counter +=1
+            prizes.pop(prizes.index(prize))
+    
+    main_display.blit(FONT.render(str(counter),True, COLOR_WHITE),(WIDTH-50,20))          
     main_display.blit(player, player_rect)  
       
     pygame.display.flip()
