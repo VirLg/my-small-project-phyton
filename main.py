@@ -1,63 +1,70 @@
+import os
 import random
 import pygame
 from pygame.constants import QUIT, K_DOWN, K_UP, K_LEFT, K_RIGHT, K_w
-
 pygame.init()
 FPS = pygame.time.Clock()
             # Display
-WIDTH = 800
-HEIGHT=600
+WIDTH = 1200
+HEIGHT=750
 FONT=pygame.font.SysFont("Verdana", 20)
-
 main_display = pygame.display.set_mode((WIDTH,HEIGHT))
 BACKGROUND=pygame.transform.scale(pygame.image.load('background.png'), (WIDTH,HEIGHT))
 BG_X1=0
 BG_X2=BACKGROUND.get_width()
 BG_move=3
-
-
-COLOR_BLACK=(0,0,0)
             # Player
-COLOR_WHITE = (255,255,255)
-player_size = (80,30)
-player =pygame.image.load("player.png").convert_alpha() # player = pygame.Surface(player_size)
+PLAYER_PATH = ('goose') 
+PLAYER_IMAGES=os.listdir(PLAYER_PATH)           
+player =pygame.image.load("player.png").convert_alpha()
+
+player_size = player.get_size()
 player_rect=pygame.Rect(0 ,300, *player_size)
-# player_rect = player.get_rect()
 player_move_down=[0,5]
 player_move_up=[0,-5]
 player_move_left=[-5,0]
 player_move_right=[5,0]
+# player_rect = player.get_rect()
+# player = pygame.Surface(player_size)
 # player.fill(COLOR_WHITE)
+COLOR_WHITE=(255,255,255)
             # Enemy
 def create_enemy():            
     COLOR_BLUE = (0,0,255)
-    enemy_size = (20,80)
     enemy =pygame.image.load("enemy.png").convert_alpha()
+    enemy_size=enemy.get_size()
+    enemy_rect=pygame.Rect(WIDTH ,random.randint(50,HEIGHT-50), *enemy_size)
+    enemy_move=[random.randint(-28,-12),0]
+    return [enemy, enemy_rect, enemy_move]
+CREATE_ENEMY = pygame.USEREVENT+1
+pygame.time.set_timer(CREATE_ENEMY,2000)
+    # enemy_size = (20,80)
     # enemy = pygame.Surface(enemy_size)
     # enemy.fill(COLOR_BLUE)
-    enemy_rect=pygame.Rect(WIDTH ,random.randint(50,HEIGHT-50), *enemy_size)
-    enemy_move=[random.randint(-8,-4),0]
-    return [enemy, enemy_rect, enemy_move]
-
-CREATE_ENEMY = pygame.USEREVENT+1
-pygame.time.set_timer(CREATE_ENEMY,2500)
             # Prize
 def create_prize():              
     COLOR_RED = (255,0,0)
-    prize_size = (20,20)
+    # prize_size = (20,20)
     prize =pygame.image.load("bonus.png").convert_alpha()
+    prize_size=prize.get_size()
     # prize = pygame.Surface(prize_size)
     # prize.fill(COLOR_RED)
-    prize_rect=pygame.Rect(random.randint(50,WIDTH-50),0, *prize_size)
+    prize_rect=pygame.Rect(random.randint(100,WIDTH-100),0, *prize_size)
     prize_move=[0,random.randint(4,8)]
     return[prize,prize_rect,prize_move]
 CREATE_PRIZE = pygame.USEREVENT+2
 pygame.time.set_timer(CREATE_PRIZE,5000)
 
+
+CHANGE_GOOSE_IMAGE = pygame.USEREVENT+3
+pygame.time.set_timer(CHANGE_GOOSE_IMAGE,200)
+
 enemies=[]
 prizes=[]
 counter=0
 playing=True
+image_goose_index = 0
+
 while playing:
     FPS.tick(1200)   
     for event in pygame.event.get():
@@ -67,6 +74,12 @@ while playing:
             enemies.append(create_enemy())
         if event.type==CREATE_PRIZE:
             prizes.append(create_prize())
+        if event.type== CHANGE_GOOSE_IMAGE:
+            print(PLAYER_IMAGES)
+            player=pygame.image.load(os.path.join(PLAYER_PATH, PLAYER_IMAGES[image_goose_index]))
+            image_goose_index+=1
+            if image_goose_index>=len(PLAYER_IMAGES):
+                image_goose_index=0
                        
     # main_display.blit(BACKGROUND, (0,0))
     BG_X1-=BG_move
